@@ -13,7 +13,7 @@ import useVersioning from "@theme/hooks/useVersioning";
 
 const urlMatchesPrefix = (url, prefix) => {
   if (prefix.endsWith("/")) {
-    throw new Error(`prefix must not end with a /. This is a bug.`);
+    throw new Error(`prefix must not end with a /.`);
   }
   return url === prefix || url.startsWith(`${prefix}/`);
 };
