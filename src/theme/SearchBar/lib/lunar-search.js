@@ -23,7 +23,7 @@ class LunrSearchAdapter {
                     boost: 0,
                 });
             }
-        });
+        }).filter((result)=> result.score > 0);
     }
 
     getHit(doc, formattedTitle, formattedContent) {
