@@ -101,8 +101,9 @@ module.exports = function (context, options) {
           keywords: d.keywords,
         }
         
-        if(version)
+        if(version) {
           lunrAddOptions={...lunrAddOptions,...{version}};
+        }
 
         lunrBuilder.add(lunrAddOptions);
         searchDocuments.push(d);
