@@ -1,4 +1,7 @@
-const { parentPort, workerData } = require('worker_threads')
+const {
+  parentPort,
+  workerData
+} = require('worker_threads')
 
 // unified imports
 const unified = require('unified')
@@ -9,10 +12,15 @@ const toText = require('hast-util-to-text')
 const is = require('unist-util-is')
 const toVfile = require('to-vfile')
 
-const sectionHeaderTest = ({ tagName }) => ['h2', 'h3'].includes(tagName)
+const sectionHeaderTest = ({
+  tagName
+}) => ['h2', 'h3'].includes(tagName)
 
 // Build search data for a html
-function* scanDocuments({ path, url }) {
+function* scanDocuments({
+  path,
+  url
+}) {
   let vfile
   try {
     vfile = toVfile.readSync(path)
@@ -25,7 +33,9 @@ function* scanDocuments({ path, url }) {
   }
 
   const hast = unified()
-    .use(parse, { emitParseErrors: false })
+    .use(parse, {
+      emitParseErrors: false
+    })
     .parse(vfile)
 
   const article = select('article', hast)
@@ -62,7 +72,11 @@ function* scanDocuments({ path, url }) {
   }
 
   for (const sectionDesc of sectionHeaders) {
-    const { title, content, ref } = sectionDesc;
+    const {
+      title,
+      content,
+      ref
+    } = sectionDesc;
     yield {
       title,
       type: 1,

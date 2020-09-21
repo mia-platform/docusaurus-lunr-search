@@ -1,7 +1,7 @@
-const path = require('path')
-const fs = require('fs')
-const lunr = require('lunr')
-const minimatch = require('minimatch')
+const path = require("path");
+const fs = require("fs");
+const lunr = require("lunr");
+const minimatch = require("minimatch");
 
 /**
  * Based on code from https://github.com/cmfcmf/docusaurus-search-local/
@@ -21,8 +21,8 @@ function generateLunrClientJS(outDir, language = "en") {
         lunrClient += 'require("lunr-languages/lunr.stemmer.support")(lunr);\n';
         if (Array.isArray(language)) {
             language
-                .filter(code => code !== "en")
-                .forEach(code => {
+                .filter((code) => code !== "en")
+                .forEach((code) => {
                     require(`lunr-languages/lunr.${code}`)(lunr);
                     lunrClient += `require("lunr-languages/lunr.${code}")(lunr);\n`;
                 });
@@ -49,33 +49,39 @@ function generateLunrClientJS(outDir, language = "en") {
 }
 
 function getFilePaths(routesPaths, outDir, baseUrl, options = {}) {
-    const files = []
+    const files = [];
     const addedFiles = new Set();
-    const { excludeRoutes = [], indexBaseUrl = false } = options
+    const {
+        excludeRoutes = [], indexBaseUrl = false
+    } = options;
     const meta = {
         excludedCount: 0,
-    }
+    };
 
     routesPaths.forEach((route) => {
-        if ((!indexBaseUrl && route === baseUrl) || route === `${baseUrl}404.html`) return
-        route = route.substr(baseUrl.length)
-        const filePath = path.join(outDir, route, "index.html")
+        if ((!indexBaseUrl && route === baseUrl) || route === `${baseUrl}404.html`)
+            return;
+        route = route.substr(baseUrl.length);
+        const filePath = path.join(outDir, route, "index.html");
+
         // In case docs only mode routesPaths has baseUrl twice
-        if(addedFiles.has(filePath)) return
-        if (excludeRoutes.some((excludePattern) => minimatch(route, excludePattern))) {
-            meta.excludedCount++
-            return
+        if (addedFiles.has(filePath)) return;
+        if (
+            excludeRoutes.some((excludePattern) => minimatch(route, excludePattern))
+        ) {
+            meta.excludedCount++;
+            return;
         }
         files.push({
             path: filePath,
             url: route,
         });
         addedFiles.add(filePath);
-    })
-    return [files, meta]
+    });
+    return [files, meta];
 }
 
 module.exports = {
     generateLunrClientJS,
     getFilePaths,
-}
+};

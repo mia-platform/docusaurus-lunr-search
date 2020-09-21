@@ -4,6 +4,9 @@ import autocomplete from "autocomplete.js";
 import templates from "./templates";
 import utils from "./utils";
 import $ from "autocomplete.js/zepto";
+import {
+    version
+} from "react";
 
 /**
  * Adds an autocomplete dropdown to an input field
@@ -25,20 +28,22 @@ class DocSearch {
         autocompleteOptions = {
             debug: false,
             hint: false,
-            autoselect: true
+            autoselect: true,
         },
         transformData = false,
         queryHook = false,
         handleSelected = false,
+        versionsToSearch,
         enhancedSearchInput = false,
-        layout = "collumns"
+        layout = "collumns",
     }) {
+        this.versionsToSearch = versionsToSearch;
         this.input = DocSearch.getInputFromSelector(inputSelector);
         this.queryDataCallback = queryDataCallback || null;
         const autocompleteOptionsDebug =
-            autocompleteOptions && autocompleteOptions.debug
-                ? autocompleteOptions.debug
-                : false;
+            autocompleteOptions && autocompleteOptions.debug ?
+            autocompleteOptions.debug :
+            false;
         // eslint-disable-next-line no-param-reassign
         autocompleteOptions.debug = debug || autocompleteOptionsDebug;
         this.autocompleteOptions = autocompleteOptions;
@@ -60,23 +65,21 @@ class DocSearch {
         if (enhancedSearchInput) {
             this.input = DocSearch.injectSearchBox(this.input);
         }
-        this.autocomplete = autocomplete(this.input, autocompleteOptions, [
-            {
-                source: this.getAutocompleteSource(transformData, queryHook),
-                templates: {
-                    suggestion: DocSearch.getSuggestionTemplate(this.isSimpleLayout),
-                    footer: templates.footer,
-                    empty: DocSearch.getEmptyTemplate()
-                }
-            }
-        ]);
+        this.autocomplete = autocomplete(this.input, autocompleteOptions, [{
+            source: this.getAutocompleteSource(transformData, queryHook),
+            templates: {
+                suggestion: DocSearch.getSuggestionTemplate(this.isSimpleLayout),
+                footer: templates.footer,
+                empty: DocSearch.getEmptyTemplate(),
+            },
+        }, ]);
 
         const customHandleSelected = handleSelected;
         this.handleSelected = customHandleSelected || this.handleSelected;
 
         // We prevent default link clicking if a custom handleSelected is defined
         if (customHandleSelected) {
-            $(".algolia-autocomplete").on("click", ".ds-suggestions a", event => {
+            $(".algolia-autocomplete").on("click", ".ds-suggestions a", (event) => {
                 event.preventDefault();
             });
         }
@@ -98,10 +101,7 @@ class DocSearch {
 
     static injectSearchBox(input) {
         input.before(templates.searchBox);
-        const newInput = input
-            .prev()
-            .prev()
-            .find("input");
+        const newInput = input.prev().prev().find("input");
         input.remove();
         return newInput;
     }
@@ -150,7 +150,8 @@ class DocSearch {
                 // eslint-disable-next-line no-param-reassign
                 query = queryHook(query) || query;
             }
-            this.client.search(query).then(hits => {
+
+            this.client.search(query, this.versionsToSearch).then((hits) => {
                 if (
                     this.queryDataCallback &&
                     typeof this.queryDataCallback == "function"
@@ -169,7 +170,7 @@ class DocSearch {
     // a Hogan template
     static formatHits(receivedHits) {
         const clonedHits = utils.deepClone(receivedHits);
-        const hits = clonedHits.map(hit => {
+        const hits = clonedHits.map((hit) => {
             if (hit._highlightResult) {
                 // eslint-disable-next-line no-param-reassign
                 hit._highlightResult = utils.mergeKeyWithParent(
@@ -193,17 +194,18 @@ class DocSearch {
         groupedHits = utils.flattenAndFlagFirst(groupedHits, "isCategoryHeader");
 
         // Translate hits into smaller objects to be send to the template
-        return groupedHits.map(hit => {
+        return groupedHits.map((hit) => {
             const url = DocSearch.formatURL(hit);
             const category = utils.getHighlightedValue(hit, "lvl0");
             const subcategory = utils.getHighlightedValue(hit, "lvl1") || category;
+
             const displayTitle = utils
                 .compact([
                     utils.getHighlightedValue(hit, "lvl2") || subcategory,
                     utils.getHighlightedValue(hit, "lvl3"),
                     utils.getHighlightedValue(hit, "lvl4"),
                     utils.getHighlightedValue(hit, "lvl5"),
-                    utils.getHighlightedValue(hit, "lvl6")
+                    utils.getHighlightedValue(hit, "lvl6"),
                 ])
                 .join(
                     '<span class="aa-suggestion-title-separator" aria-hidden="true"> › </span>'
@@ -212,13 +214,13 @@ class DocSearch {
             const isTextOrSubcategoryNonEmpty =
                 (subcategory && subcategory !== "") ||
                 (displayTitle && displayTitle !== "");
-            const isLvl1EmptyOrDuplicate =
-                !subcategory || subcategory === "" || subcategory === category;
+            const isLvl1EmptyOrDuplicate = !subcategory || subcategory === "" || subcategory === category;
             const isLvl2 =
                 displayTitle && displayTitle !== "" && displayTitle !== subcategory;
-            const isLvl1 =
-                !isLvl2 &&
-                (subcategory && subcategory !== "" && subcategory !== category);
+            const isLvl1 = !isLvl2 &&
+                subcategory &&
+                subcategory !== "" &&
+                subcategory !== category;
             const isLvl0 = !isLvl1 && !isLvl2;
 
             return {
@@ -233,13 +235,16 @@ class DocSearch {
                 subcategory,
                 title: displayTitle,
                 text,
-                url
+                url,
             };
         });
     }
 
     static formatURL(hit) {
-        const { url, anchor } = hit;
+        const {
+            url,
+            anchor
+        } = hit;
         if (url) {
             const containsAnchor = url.indexOf("#") !== -1;
             if (containsAnchor) return url;
@@ -253,15 +258,15 @@ class DocSearch {
     }
 
     static getEmptyTemplate() {
-        return args => Hogan.compile(templates.empty).render(args);
+        return (args) => Hogan.compile(templates.empty).render(args);
     }
 
     static getSuggestionTemplate(isSimpleLayout) {
-        const stringTemplate = isSimpleLayout
-            ? templates.suggestionSimple
-            : templates.suggestion;
+        const stringTemplate = isSimpleLayout ?
+            templates.suggestionSimple :
+            templates.suggestion;
         const template = Hogan.compile(stringTemplate);
-        return suggestion => template.render(suggestion);
+        return (suggestion) => template.render(suggestion);
     }
 
     handleSelected(input, event, suggestion, datasetNumber, context = {}) {
@@ -285,13 +290,13 @@ class DocSearch {
         }
 
         const alignClass =
-            middleOfInput - middleOfWindow >= 0
-                ? "algolia-autocomplete-right"
-                : "algolia-autocomplete-left";
+            middleOfInput - middleOfWindow >= 0 ?
+            "algolia-autocomplete-right" :
+            "algolia-autocomplete-left";
         const otherAlignClass =
-            middleOfInput - middleOfWindow < 0
-                ? "algolia-autocomplete-right"
-                : "algolia-autocomplete-left";
+            middleOfInput - middleOfWindow < 0 ?
+            "algolia-autocomplete-right" :
+            "algolia-autocomplete-left";
         const autocompleteWrapper = $(".algolia-autocomplete");
         if (!autocompleteWrapper.hasClass(alignClass)) {
             autocompleteWrapper.addClass(alignClass);
