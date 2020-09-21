@@ -30,9 +30,11 @@ class DocSearch {
         transformData = false,
         queryHook = false,
         handleSelected = false,
+        versionsToSearch,
         enhancedSearchInput = false,
         layout = "collumns"
     }) {
+        this.versionsToSearch = versionsToSearch;
         this.input = DocSearch.getInputFromSelector(inputSelector);
         this.queryDataCallback = queryDataCallback || null;
         const autocompleteOptionsDebug =
@@ -150,7 +152,7 @@ class DocSearch {
                 // eslint-disable-next-line no-param-reassign
                 query = queryHook(query) || query;
             }
-            this.client.search(query).then(hits => {
+            this.client.search(query, this.versionsToSearch).then(hits => {
                 if (
                     this.queryDataCallback &&
                     typeof this.queryDataCallback == "function"
