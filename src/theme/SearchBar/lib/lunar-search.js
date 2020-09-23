@@ -7,7 +7,7 @@ class LunrSearchAdapter {
         this.lunrIndex = lunr.Index.load(searchIndex);
     }
 
-    getLunrResult(input) {
+    getLunrResult(input, versions) {
         return this.lunrIndex.query(function (query) {
             const tokens = lunr.tokenizer(input);
             query.term(tokens, {
@@ -16,7 +16,14 @@ class LunrSearchAdapter {
             query.term(tokens, {
                 wildcard: lunr.Query.wildcard.TRAILING
             });
-        });
+
+            if(versions) {
+                query.term(versions.join(" "), {
+                    fields: ["version"],
+                    boost: 0,
+                });
+            }
+        }).filter((result)=> result.score > 0);
     }
 
     getHit(doc, formattedTitle, formattedContent) {
@@ -110,9 +117,9 @@ class LunrSearchAdapter {
         return this.getHit(doc, null, preview);
 
     }
-    search(input) {
+    search(input, versions) {
         return new Promise((resolve, rej) => {
-            const results = this.getLunrResult(input);
+            const results = this.getLunrResult(input, versions);
             const hits = [];
             results.length > 5 && (results.length = 5);
             this.titleHitsRes = []

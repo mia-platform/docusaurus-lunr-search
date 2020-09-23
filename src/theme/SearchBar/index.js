@@ -5,16 +5,58 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React, { useRef, useCallback } from "react";
+import React, { useRef, useCallback, useState, useEffect, version} from "react";
 import classnames from "classnames";
-import { useHistory } from "@docusaurus/router";
+import { useHistory, useLocation } from "@docusaurus/router";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
+import useVersioning from "@theme/hooks/useVersioning";
+
+const urlMatchesPrefix = (url, prefix) => {
+  if (prefix.endsWith("/")) {
+    throw new Error(`prefix must not end with a /.`);
+  }
+  return url === prefix || url.startsWith(`${prefix}/`);
+};
+
+const determineDocsVersionFromURL = (
+  path,
+  basePath,
+  docsBaseRoutePath,
+  versions
+) => {
+  // Array of versions that have route prefixes.
+  // The latest version (version[0]) has no route prefix.
+  const routeBasedVersions = ["next", ...versions.slice(1)];
+  for (const version of routeBasedVersions) {
+    if (urlMatchesPrefix(path, `${basePath}${docsBaseRoutePath}/${version}`)) {
+      return version;
+    }
+  }
+  return versions[0];
+};
+
 const Search = props => {
   const initialized = useRef(false);
   const searchBarRef = useRef(null);
   const history = useHistory();
   const { siteConfig = {} } = useDocusaurusContext();
   const { baseUrl } = siteConfig;
+  const { versioningEnabled, versions, latestVersion } = useVersioning();
+  const [versionToSearch, setVersionToSearch] = useState(latestVersion);
+  const location = useLocation();
+
+  // Update versionToSearch based on the URL
+  useEffect(() => {
+    if (!versioningEnabled) {
+      return null;
+    }
+    // We cannot simply query for the meta tag that specifies the version,
+    // because the tag is updated AFTER this effect runs and there is no
+    // hook/callback available that runs after the meta tag changes.
+    setVersionToSearch(determineDocsVersionFromURL(location.pathname, baseUrl, "docs", versions));
+  }, [location, baseUrl, versions]);
+
+
   const initAlgolia = (searchDocs, searchIndex, DocSearch) => {
       new DocSearch({
         searchDocs,
@@ -32,7 +74,8 @@ const Search = props => {
           // So, we can safely remove it. See https://github.com/facebook/docusaurus/issues/1828 for more details.
 
           history.push(url);
-        }
+        },
+        versionsToSearch: versionToSearch ? [versionToSearch] : null,
       });
   };
 

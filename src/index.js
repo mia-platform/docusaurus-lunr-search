@@ -40,7 +40,7 @@ module.exports = function (context, options) {
     async postBuild({ routesPaths = [], outDir, baseUrl }) {
       console.log('docusaurus-lunr-search:: Building search docs and lunr index file')
       console.time('docusaurus-lunr-search:: Indexing time')
-
+ 
       const [files, meta] = utils.getFilePaths(routesPaths, outDir, baseUrl, options)
       if (meta.excludedCount) {
         console.log(`docusaurus-lunr-search:: ${meta.excludedCount} documents were excluded from the search by excludeRoutes config`)
@@ -63,13 +63,49 @@ module.exports = function (context, options) {
         }
       })
 
+      const versionRegex = options.versionRegex ? new RegExp(options.versionRegex, options.versionRegexOptions) : null;
+
       const addToSearchData = (d) => {
-        lunrBuilder.add({
+        // read the list of docusaurus versions
+        const docVersions = [
+          ...JSON.parse(
+            fs.readFileSync(
+              path.join(
+                path.resolve(context.siteDir, "docs"),
+                "..",
+                "versions.json"
+              ),
+              "utf-8"
+            )
+          ),
+          "next",
+        ];
+
+        // Determine the version of current document
+        let version = null;
+
+        if (versionRegex && docVersions && docVersions.length) {
+          version = docVersions[0];
+          const matchedVersion = d.url.match(versionRegex);
+          //
+          if (!!matchedVersion && matchedVersion.length) {
+            version = matchedVersion[1];
+          } else if (d.url.includes("/next/"))
+            version = "next";
+        }
+        
+        let lunrAddOptions={
           id: searchDocuments.length,
           title: d.title,
           content: d.content,
-          keywords: d.keywords
-        });
+          keywords: d.keywords,
+        }
+        
+        if(version) {
+          lunrAddOptions={...lunrAddOptions,...{version}};
+        }
+
+        lunrBuilder.add(lunrAddOptions);
         searchDocuments.push(d);
       }
 
