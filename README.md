@@ -64,7 +64,7 @@ Note: Docusaurus search information can only be generated from a production buil
 
 ## Versioned search options
 
-The plugin supports versioned search compliant with the [Docusaurus 2nd use case](https://v2.docusaurus.io/docs/versioning/#recommended-practices).:
+The plugin supports versioned search compliant with the [Docusaurus 2nd use case](https://v2.docusaurus.io/docs/versioning/#recommended-practices):
 
 ```js
 module.exports = {
