@@ -1,6 +1,7 @@
 # docusaurus-lunr-search
 
 Offline Search for Docusaurus V2, forked from original plugin [docusaurus-lunr-search](https://lelouch77.github.io).
+The main difference from the original plugin it's the possibility to perform a versioned search compliant with the [Docusaurus 2nd use case](https://v2.docusaurus.io/docs/versioning/#recommended-practices).
 
 [Demo Website](https://lelouch77.github.io/docusaurus-lunr-search-multilang/)
 
@@ -69,21 +70,21 @@ Note: Docusaurus search information can only be generated from a production buil
 
 ## Versioned search options
 
-The plugin supports versioned search:
+The plugin supports versioned search compliant with the [Docusaurus 2nd use case](https://v2.docusaurus.io/docs/versioning/#recommended-practices).:
 
-```
+```js
 module.exports = {
   // ...
     plugins: [
       [
         require.resolve('docusaurus-lunr-search'),
         {
-          // Regex to identify the version name of each document
+          // Regex to get version name from the locations of the documents
           // N.B: The Regex have to include one and only capturing group.
           // This encloses the version name
-          versionRegex: "docs\\/(\d+\.x\.x)",
-          versionRegexOptions: ".."  // Eventually regex modificators, eg. "gmi"
 
+          // In this case will capture "docs/5.x","docs/6.x", ect.
+          versionPathRegex: "docs\\/(\\d+.x)"
         }
       ],
     ]
@@ -94,7 +95,7 @@ If the documentation versioning is disabled the searching will include all docum
 
 ## Language options
 
-```
+```js
 module.exports = {
   // ...
     plugins: [[ require.resolve('docusaurus-lunr-search'), {
@@ -111,7 +112,7 @@ Supports all the language listed here <https://github.com/MihaiValentin/lunr-lan
 
 You can exclude certain routes from the search by using this option:
 
-```
+```js
 module.exports = {
   // ...
     plugins: [
@@ -128,7 +129,7 @@ module.exports = {
 
 Base url will not indexed by default, if you want to index the base url set this option to `true`
 
-```
+```js
 module.exports = {
   // ...
     plugins: [
