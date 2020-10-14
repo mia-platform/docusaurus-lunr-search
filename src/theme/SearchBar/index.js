@@ -5,44 +5,32 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React, { useRef, useCallback, useState, useEffect, version} from "react";
+import React, { useRef, useCallback, useState, useEffect, version } from "react";
 import classnames from "classnames";
 import { useHistory, useLocation } from "@docusaurus/router";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import useVersioning from "@theme/hooks/useVersioning";
 
-const urlMatchesPrefix = (url, prefix) => {
-  if (prefix.endsWith("/")) {
-    throw new Error(`prefix must not end with a /.`);
-  }
-  return url === prefix || url.startsWith(`${prefix}/`);
-};
-
 const determineDocsVersionFromURL = (
   path,
-  basePath,
-  docsBaseRoutePath,
-  versions
+  versionPathRegex
 ) => {
-  // Array of versions that have route prefixes.
-  // The latest version (version[0]) has no route prefix.
-  const routeBasedVersions = ["next", ...versions.slice(1)];
-  for (const version of routeBasedVersions) {
-    if (urlMatchesPrefix(path, `${basePath}${docsBaseRoutePath}/${version}`)) {
-      return version;
-    }
+  if (versionPathRegex) {
+    const matchedVersion = path.match(new RegExp(`^\\/${versionPathRegex}`));
+    //
+    return !!matchedVersion && matchedVersion.length ? matchedVersion[1] : "current";
   }
-  return versions[0];
 };
 
 const Search = props => {
   const initialized = useRef(false);
   const searchBarRef = useRef(null);
   const history = useHistory();
-  const { siteConfig = {} } = useDocusaurusContext();
+  const { siteConfig } = useDocusaurusContext();
+  const { versionPathRegex } = siteConfig?.customFields;
   const { baseUrl } = siteConfig;
-  const { versioningEnabled, versions, latestVersion } = useVersioning();
-  const [versionToSearch, setVersionToSearch] = useState(latestVersion);
+  const { versioningEnabled } = useVersioning();
+  const [currentVersion, setCurrentVersion] = useState(null);
   const location = useLocation();
 
   // Update versionToSearch based on the URL
@@ -53,30 +41,30 @@ const Search = props => {
     // We cannot simply query for the meta tag that specifies the version,
     // because the tag is updated AFTER this effect runs and there is no
     // hook/callback available that runs after the meta tag changes.
-    setVersionToSearch(determineDocsVersionFromURL(location.pathname, baseUrl, "docs", versions));
+    setCurrentVersion(determineDocsVersionFromURL(location.pathname, versionPathRegex));
   }, [location, baseUrl, versions]);
 
 
-  const initAlgolia = (searchDocs, searchIndex, DocSearch) => {
-      new DocSearch({
-        searchDocs,
-        searchIndex,
-        inputSelector: "#search_input_react",
-        // Override algolia's default selection event, allowing us to do client-side
-        // navigation and avoiding a full page refresh.
-        handleSelected: (_input, _event, suggestion) => {
-          const url = baseUrl + suggestion.url;
-          // Use an anchor tag to parse the absolute url into a relative url
-          // Alternatively, we can use new URL(suggestion.url) but its not supported in IE
-          const a = document.createElement("a");
-          a.href = url;
-          // Algolia use closest parent element id #__docusaurus when a h1 page title does not have an id
-          // So, we can safely remove it. See https://github.com/facebook/docusaurus/issues/1828 for more details.
+  const initAlgolia = (searchDocs, searchIndex, DocSearch, versionWhereSearch) => {
+    new DocSearch({
+      searchDocs,
+      searchIndex,
+      inputSelector: "#search_input_react",
+      // Override algolia's default selection event, allowing us to do client-side
+      // navigation and avoiding a full page refresh.
+      handleSelected: (_input, _event, suggestion) => {
+        const url = baseUrl + suggestion.url;
+        // Use an anchor tag to parse the absolute url into a relative url
+        // Alternatively, we can use new URL(suggestion.url) but its not supported in IE
+        const a = document.createElement("a");
+        a.href = url;
+        // Algolia use closest parent element id #__docusaurus when a h1 page title does not have an id
+        // So, we can safely remove it. See https://github.com/facebook/docusaurus/issues/1828 for more details.
 
-          history.push(url);
-        },
-        versionsToSearch: versionToSearch ? [versionToSearch] : null,
-      });
+        history.push(url);
+      },
+      versionWhereSearch: versionWhereSearch ? [versionWhereSearch] : null,
+    });
   };
 
   const getSearchDoc = () =>
@@ -97,7 +85,7 @@ const Search = props => {
         import("./lib/DocSearch"),
         import("./algolia.css")
       ]).then(([searchDocs, searchIndex, { default: DocSearch }]) => {
-        initAlgolia(searchDocs, searchIndex, DocSearch);
+        initAlgolia(searchDocs, searchIndex, DocSearch, currentVersion);
       });
       initialized.current = true;
     }

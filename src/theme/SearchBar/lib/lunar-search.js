@@ -17,13 +17,14 @@ class LunrSearchAdapter {
                 wildcard: lunr.Query.wildcard.TRAILING
             });
 
-            if(versions) {
+            if (versions) {
                 query.term(versions.join(" "), {
                     fields: ["version"],
                     boost: 0,
+                    presence: lunr.Query.presence.REQUIRED,
                 });
             }
-        }).filter((result)=> result.score > 0);
+        }).filter((result) => result.score > 0);
     }
 
     getHit(doc, formattedTitle, formattedContent) {
