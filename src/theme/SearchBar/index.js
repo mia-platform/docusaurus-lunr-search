@@ -103,7 +103,13 @@ const Search = props => {
   );
 
   return (
-    <div className="navbar__search" key="search-box">
+    <div
+      className={classnames("navbar__search", {
+        "navbar-search-home": props.searchBarInHome,
+        "navbar-big": props.searchBarInHome,
+      })}
+      key="search-box"
+    >
       <span
         aria-label="expand searchbar"
         role="button"
@@ -126,6 +132,7 @@ const Search = props => {
         )}
         onClick={loadAlgolia}
         onMouseOver={loadAlgolia}
+        placeholder={props.placeholder || "Search"}
         onFocus={toggleSearchIconClick}
         onBlur={toggleSearchIconClick}
         ref={searchBarRef}
