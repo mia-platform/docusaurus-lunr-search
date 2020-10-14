@@ -80,7 +80,7 @@ module.exports = function (context, options) {
 
         // Determine the version of current document
         // if it hasn't version it's part of the last current public version
-        let version = versions?.length ? "current" : null;
+        let version = versions && versions.length ? "current" : null;
 
 
         // Retrieve, from plugin options, the Regex expression for getting version info from the path
