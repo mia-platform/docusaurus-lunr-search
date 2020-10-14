@@ -121,7 +121,7 @@ const Search = props => {
         tabIndex={0}
       />
       <input
-        id={props.searchBarId || "search_input_react"}
+        id="search_input_react"
         type="search"
         placeholder="Search"
         aria-label="Search"
