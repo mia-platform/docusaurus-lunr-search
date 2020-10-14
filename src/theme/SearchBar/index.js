@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React, { useRef, useCallback, useState, useEffect, version } from "react";
+import React, { useRef, useCallback, useState, useEffect } from "react";
 import classnames from "classnames";
 import { useHistory, useLocation } from "@docusaurus/router";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";

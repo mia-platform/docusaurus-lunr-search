@@ -122,7 +122,7 @@ class LunrSearchAdapter {
 
     }
     search(input, versions) {
-        return new Promise((resolve, rej) => {
+        return new Promise((resolve) => {
             const results = this.getLunrResult(input, versions);
             const hits = [];
             results.length > 5 && (results.length = 5);
