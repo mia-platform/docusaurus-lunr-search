@@ -42,7 +42,7 @@ const Search = props => {
     // because the tag is updated AFTER this effect runs and there is no
     // hook/callback available that runs after the meta tag changes.
     setCurrentVersion(determineDocsVersionFromURL(location.pathname, versionPathRegex));
-  }, [location, baseUrl, versions]);
+  }, [location, baseUrl]);
 
 
   const initAlgolia = (searchDocs, searchIndex, DocSearch, versionWhereSearch) => {
