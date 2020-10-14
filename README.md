@@ -37,18 +37,12 @@ npm run swizzle docusaurus-lunr-search SearchBar
 
 3. Add the docusaurus-lunr-search plugin to your `docusaurus.config.js`
 
-```
+```js
 module.exports = {
   // ...
     plugins: [
       [
-        require.resolve('docusaurus-lunr-search'),
-        {
-          // Regex to get name of version to attach the
-          versionRegex: "docs\\/(\d+\.x\.x)",
-          versionRegexOptions: ".."  // Eventually regex modificators, eg. "gmi"
-
-        }
+        require.resolve('docusaurus-lunr-search')
       ],
     ]
 }
@@ -56,13 +50,13 @@ module.exports = {
 
 4. Then build your Docusaurus project
 
-```
+```cmd
 npm run build
 ```
 
 5. Serve your application
 
-```
+```cmd
 npx http-server ./build
 ```
 
