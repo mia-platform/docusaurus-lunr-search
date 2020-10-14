@@ -31,7 +31,6 @@ class DocSearch {
         queryHook = false,
         handleSelected = false,
         versionWhereSearch,
-        versionsToSearch,
         enhancedSearchInput = false,
         layout = "collumns"
     }) {
