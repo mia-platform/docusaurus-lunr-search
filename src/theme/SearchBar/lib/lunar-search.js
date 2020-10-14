@@ -18,6 +18,9 @@ class LunrSearchAdapter {
             });
 
             if (versions) {
+                // If at least one version was provide add relative search field
+                // "boost: 0" ensure that a page doesn't appear in search results even if only its version match
+                // " presence:...REQUIRED" ensure that a page appears in search results only if belong to the right version
                 query.term(versions.join(" "), {
                     fields: ["version"],
                     boost: 0,
