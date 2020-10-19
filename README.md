@@ -56,7 +56,7 @@ npm run build
 
 5. Serve your application
 
-```cmd
+```sh
 npx http-server ./build
 ```
 
