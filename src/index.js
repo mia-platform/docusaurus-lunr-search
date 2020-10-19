@@ -93,7 +93,7 @@ module.exports = function (context, options) {
             version = matchedVersion[1];
         }
 
-        let lunrAddOptions = {
+        const lunrAddOptions = {
           id: searchDocuments.length,
           title: d.title,
           content: d.content,
