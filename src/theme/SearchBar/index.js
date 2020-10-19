@@ -25,7 +25,7 @@ const Search = props => {
   const initialized = useRef(false);
   const searchBarRef = useRef(null);
   const history = useHistory();
-  const { siteConfig } = useDocusaurusContext();
+  const { siteConfig = {} } = useDocusaurusContext();
   const { versionPathRegex } = siteConfig.customFields;
   const { baseUrl } = siteConfig;
   const { versioningEnabled } = useVersioning();
