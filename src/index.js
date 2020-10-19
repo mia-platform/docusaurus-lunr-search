@@ -101,7 +101,7 @@ module.exports = function (context, options) {
         }
 
         if (version) {
-          lunrAddOptions = { ...lunrAddOptions, ...{ version } };
+          lunrAddOptions.version = version
         }
 
         lunrBuilder.add(lunrAddOptions);
