@@ -17,7 +17,6 @@ const determineDocsVersionFromURL = (
 ) => {
   if (versionPathRegex) {
     const matchedVersion = path.match(new RegExp(`^\\/${versionPathRegex}`));
-    //
     return !!matchedVersion && matchedVersion.length ? matchedVersion[1] : "current";
   }
 };
