@@ -50,7 +50,7 @@ module.exports = {
 
 4. Then build your Docusaurus project
 
-```cmd
+```sh
 npm run build
 ```
 
