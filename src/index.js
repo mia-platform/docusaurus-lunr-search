@@ -89,8 +89,9 @@ module.exports = function (context, options) {
         if (versionPathRegex && versions && versions.length) {
           const matchedVersion = d.url.match(versionPathRegex);
           //
-          if (!!matchedVersion && matchedVersion.length)
+          if (!!matchedVersion && matchedVersion.length) {
             version = matchedVersion[1];
+          }
         }
 
         const lunrAddOptions = {
