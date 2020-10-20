@@ -40,7 +40,7 @@ module.exports = function (context, options) {
     async postBuild({ routesPaths = [], outDir, baseUrl }) {
       console.log('docusaurus-lunr-search:: Building search docs and lunr index file')
       console.time('docusaurus-lunr-search:: Indexing time')
- 
+
       const [files, meta] = utils.getFilePaths(routesPaths, outDir, baseUrl, options)
       if (meta.excludedCount) {
         console.log(`docusaurus-lunr-search:: ${meta.excludedCount} documents were excluded from the search by excludeRoutes config`)
@@ -49,11 +49,13 @@ module.exports = function (context, options) {
       const lunrBuilder = lunr(function (builder) {
         if (languages) {
           this.use(languages)
-        } 
+        }
         this.ref('id')
         this.field('title', { boost: 200 })
         this.field('content', { boost: 2 })
         this.field('keywords', { boost: 100 })
+        this.field('version');
+
         this.metadataWhitelist = ['position']
 
         const { build } = builder
@@ -63,46 +65,44 @@ module.exports = function (context, options) {
         }
       })
 
-      const versionRegex = options.versionRegex ? new RegExp(options.versionRegex, options.versionRegexOptions) : null;
-
       const addToSearchData = (d) => {
         // read the list of docusaurus versions
-        const docVersions = [
-          ...JSON.parse(
-            fs.readFileSync(
-              path.join(
-                path.resolve(context.siteDir, "docs"),
-                "..",
-                "versions.json"
-              ),
-              "utf-8"
-            )
-          ),
-          "next",
-        ];
+        const versions = JSON.parse(
+          fs.readFileSync(
+            path.join(
+              path.resolve(context.siteDir, "docs"),
+              "..",
+              "versions.json"
+            ),
+            "utf-8"
+          )
+        );
 
         // Determine the version of current document
-        let version = null;
+        // if it hasn't version it's part of the last current public version
+        let version = versions && versions.length ? "current" : null;
 
-        if (versionRegex && docVersions && docVersions.length) {
-          version = docVersions[0];
-          const matchedVersion = d.url.match(versionRegex);
+
+        // Retrieve, from plugin options, the Regex expression for getting version info from the path
+        const { versionPathRegex } = options;
+
+        if (versionPathRegex && versions && versions.length) {
+          const matchedVersion = d.url.match(versionPathRegex);
           //
           if (!!matchedVersion && matchedVersion.length) {
             version = matchedVersion[1];
-          } else if (d.url.includes("/next/"))
-            version = "next";
+          }
         }
-        
-        let lunrAddOptions={
+
+        const lunrAddOptions = {
           id: searchDocuments.length,
           title: d.title,
           content: d.content,
-          keywords: d.keywords,
+          keywords: d.keywords
         }
-        
-        if(version) {
-          lunrAddOptions={...lunrAddOptions,...{version}};
+
+        if (version) {
+          lunrAddOptions.version = version
         }
 
         lunrBuilder.add(lunrAddOptions);
@@ -113,7 +113,7 @@ module.exports = function (context, options) {
       const lunrIndex = lunrBuilder.build()
       console.timeEnd('docusaurus-lunr-search:: Indexing time')
       console.log(`docusaurus-lunr-search:: indexed ${indexedDocuments} documents out of ${files.length}`)
-      
+
       console.log('docusaurus-lunr-search:: writing search-doc.json')
       fs.writeFileSync(
         path.join(outDir, 'search-doc.json'),
@@ -135,7 +135,7 @@ function buildSearchData(files, addToSearchData) {
   }
   let activeWorkersCount = 0
   const workerCount = Math.max(2, os.cpus().length)
-  
+
   console.log(`docusaurus-lunr-search:: Start scanning documents in ${Math.min(workerCount, files.length)} threads`)
   const gauge = new Guage()
   gauge.show('scanning documents...')
@@ -159,7 +159,7 @@ function buildSearchData(files, addToSearchData) {
         }
       }
     }
-  
+
     for (let i = 0; i < workerCount; i++) {
       if (nextIndex >= files.length) {
         break

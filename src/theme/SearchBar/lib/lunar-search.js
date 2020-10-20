@@ -17,13 +17,17 @@ class LunrSearchAdapter {
                 wildcard: lunr.Query.wildcard.TRAILING
             });
 
-            if(versions) {
+            if (versions) {
+                // If at least one version is provided, add relative search field.
+                // "boost: 0" ensure that a page doesn't appear in search results even if only its version match
+                // " presence:...REQUIRED" ensure that a page appears in search results only if belong to the right version
                 query.term(versions.join(" "), {
                     fields: ["version"],
                     boost: 0,
+                    presence: lunr.Query.presence.REQUIRED,
                 });
             }
-        }).filter((result)=> result.score > 0);
+        }).filter((result) => result.score > 0);
     }
 
     getHit(doc, formattedTitle, formattedContent) {
@@ -118,7 +122,7 @@ class LunrSearchAdapter {
 
     }
     search(input, versions) {
-        return new Promise((resolve, rej) => {
+        return new Promise((resolve) => {
             const results = this.getLunrResult(input, versions);
             const hits = [];
             results.length > 5 && (results.length = 5);
