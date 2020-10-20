@@ -3,11 +3,9 @@
 Offline Search for Docusaurus V2, forked from original plugin [docusaurus-lunr-search](https://lelouch77.github.io).
 The main difference from the original plugin it's the possibility to perform a versioned search compliant with the [Docusaurus 2nd use case](https://v2.docusaurus.io/docs/versioning/#recommended-practices).
 
-[Demo Website](https://lelouch77.github.io/docusaurus-lunr-search-multilang/)
+[![MIT Licence](https://img.shields.io/github/license/lelouch77/docusaurus-lunr-search)](#)
 
- [![MIT Licence](https://img.shields.io/github/license/lelouch77/docusaurus-lunr-search)](#)
-
-[![npm version](https://badge.fury.io/js/docusaurus-lunr-search.svg)](https://www.npmjs.com/package/docusaurus-lunr-search)
+[![npm version](https://badge.fury.io/js/docusaurus-lunr-search.svg)](https://www.npmjs.com/package/@mia-platform/docusaurus-lunr-search)
 
 ## Sample
 
@@ -25,17 +23,17 @@ For older version of node use `docusaurus-lunr-search` version `2.1.0`
 
 1. Install this package
 
-```
+```sh
 npm i docusaurus-lunr-search  --save
 ```
 
-2. Then run docusaurus swizzle
+1. Then run docusaurus swizzle
 
-```
+```sh
 npm run swizzle docusaurus-lunr-search SearchBar
 ```
 
-3. Add the docusaurus-lunr-search plugin to your `docusaurus.config.js`
+1. Add the docusaurus-lunr-search plugin to your `docusaurus.config.js`
 
 ```js
 module.exports = {
@@ -48,13 +46,13 @@ module.exports = {
 }
 ```
 
-4. Then build your Docusaurus project
+1. Then build your Docusaurus project
 
 ```sh
 npm run build
 ```
 
-5. Serve your application
+1. Serve your application
 
 ```sh
 npx http-server ./build
@@ -139,7 +137,3 @@ module.exports = {
 Thanks to [`algolia/docsearch.js`](https://github.com/algolia/docsearch), I modified it to create this search component
 
 And thanks [cmfcmf](https://github.com/cmfcmf), I used the code from his library [docusaurus-search-local](https://github.com/cmfcmf/docusaurus-search-local) for multi-language support.
-
-## Changelog
-
-Checkout the [releases](https://github.com/lelouch77/docusaurus-lunr-search/releases) page for changelog.
