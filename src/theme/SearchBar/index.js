@@ -10,6 +10,7 @@ import classnames from "classnames";
 import { useHistory, useLocation } from "@docusaurus/router";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import useVersioning from "@theme/hooks/useVersioning";
+import PropTypes from 'prop-types'
 
 const determineDocsVersionFromURL = (
   path,
@@ -139,5 +140,12 @@ const Search = props => {
     </div>
   );
 };
+
+Search.propTypes= {
+  handleSearchBarToggle:PropTypes.bool,
+  isSearchBarExpanded:PropTypes.bool,
+  placeholder:PropTypes.string,
+  searchBarInHome:PropTypes.bool,
+}
 
 export default Search;
