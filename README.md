@@ -24,13 +24,13 @@ For older version of node use `docusaurus-lunr-search` version `2.1.0`
 1. Install this package
 
 ```sh
-npm i docusaurus-lunr-search  --save
+yarn add @mia-platform/docusaurus-lunr-search
 ```
 
 1. Then run docusaurus swizzle
 
 ```sh
-npm run swizzle docusaurus-lunr-search SearchBar
+yarn swizzle --danger @mia-platform/docusaurus-lunr-search SearchBar
 ```
 
 1. Add the docusaurus-lunr-search plugin to your `docusaurus.config.js`
@@ -40,7 +40,7 @@ module.exports = {
   // ...
     plugins: [
       [
-        require.resolve('docusaurus-lunr-search')
+        require.resolve('@mia-platform/docusaurus-lunr-search')
       ],
     ]
 }
@@ -69,7 +69,7 @@ module.exports = {
   // ...
     plugins: [
       [
-        require.resolve('docusaurus-lunr-search'),
+        require.resolve('@mia-platform/docusaurus-lunr-search'),
         {
           // Regex to get version name from the locations of the documents
           // N.B: The Regex have to include one and only capturing group.
@@ -108,7 +108,7 @@ You can exclude certain routes from the search by using this option:
 module.exports = {
   // ...
     plugins: [
-    [require.resolve('docusaurus-lunr-search'), {
+    [require.resolve('@mia-platform/docusaurus-lunr-search'), {
         excludeRoutes: [
             'docs/changelogs/**/*', // exclude changelogs from indexing
         ]
@@ -125,7 +125,7 @@ Base url will not indexed by default, if you want to index the base url set this
 module.exports = {
   // ...
     plugins: [
-        [require.resolve('docusaurus-lunr-search'),
+        [require.resolve('@mia-platform/docusaurus-lunr-search'),
             {
                 indexBaseUrl: true
             }
